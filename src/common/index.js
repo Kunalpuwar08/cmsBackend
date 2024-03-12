@@ -50,9 +50,26 @@ function generateToken(data) {
   return jwt.sign(data, jwtKey, { expiresIn: "1w" });
 }
 
+function ipChecker(req, res, next) {
+  const allowedSubnet = "192.168.1";
+  const clientIP = req.ip;
+  const ipv4Address = clientIP.split(".").slice(0, 3).join(".");
+  const client = ipv4Address.includes("::ffff:")
+    ? ipv4Address.split(":").pop()
+    : ipv4Address;
+
+  if (client === allowedSubnet) {
+    next();
+    console.log("done");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+}
+
 module.exports = {
   generateRandomPassword,
   sendCredentialsByEmail,
   verifyToken,
   generateToken,
+  ipChecker
 };

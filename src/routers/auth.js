@@ -72,7 +72,11 @@ router.post("/login", async (req, res) => {
 
         return res
           .status(200)
-          .json({ message: "Admin login successful", user: admin, token });
+          .json({
+            message: "Admin login successful",
+            user: admin,
+            token: token,
+          });
       }
     }
 
@@ -80,9 +84,19 @@ router.post("/login", async (req, res) => {
     if (employee) {
       const passwordMatch = await bcrypt.compare(password, employee.password);
       if (passwordMatch) {
+        const token = generateToken({
+          userId: employee._id,
+          email: employee.email,
+          role: employee.role,
+          name: employee.name,
+        });
         return res
           .status(200)
-          .json({ message: "Employee login successful", user: employee });
+          .json({
+            message: "Employee login successful",
+            user: employee,
+            token: token,
+          });
       }
     }
 
@@ -145,6 +159,55 @@ router.post("/createemp", verifyToken, async (req, res) => {
     .catch((err) => {
       console.log(err, "Error in create employee");
     });
+});
+
+router.post("/change-password", verifyToken, async (req, res) => {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    return res.status(400).json({
+      error: "Please provide old password, new password, and confirm password",
+    });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res
+      .status(400)
+      .json({ error: "New password and confirm password do not match" });
+  }
+
+  const userId = req.user.userId;
+  const role = req.user.role;
+
+  try {
+    let user;
+    if (role === "admin") {
+      user = await Admin.findById(userId);
+    } else if (role === "employee") {
+      user = await Employee.findById(userId);
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Incorrect old password" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    user.isPasswordChanged = true;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 module.exports = router;

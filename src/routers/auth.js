@@ -70,13 +70,11 @@ router.post("/login", async (req, res) => {
           name: admin.name,
         });
 
-        return res
-          .status(200)
-          .json({
-            message: "Admin login successful",
-            user: admin,
-            token: token,
-          });
+        return res.status(200).json({
+          message: "Admin login successful",
+          user: admin,
+          token: token,
+        });
       }
     }
 
@@ -89,14 +87,14 @@ router.post("/login", async (req, res) => {
           email: employee.email,
           role: employee.role,
           name: employee.name,
+          companyName: employee.companyName,
+          companyId: employee.companyId,
         });
-        return res
-          .status(200)
-          .json({
-            message: "Employee login successful",
-            user: employee,
-            token: token,
-          });
+        return res.status(200).json({
+          message: "Employee login successful",
+          user: employee,
+          token: token,
+        });
       }
     }
 

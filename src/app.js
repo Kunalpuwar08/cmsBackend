@@ -23,7 +23,7 @@ mongoose
 const ipMiddleware = require("express-ip");
 const { ipChecker } = require("./common");
 
-app.use(ipChecker)
+// app.use(ipChecker)
 app.use(express.json());
 app.use(ipMiddleware().getIpInfoMiddleware);
 

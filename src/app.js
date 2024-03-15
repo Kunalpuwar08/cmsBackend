@@ -10,8 +10,6 @@ const todoRoute = require("./routers/todo");
 const projectRoute = require("./routers/project");
 
 const DB = process.env.DATABASE;
-console.log(DB);
-console.log(process.env);
 
 
 mongoose

@@ -7,8 +7,10 @@ const port = process.env.PORT || 3000;
 
 const authRoute = require("./routers/auth");
 const todoRoute = require("./routers/todo");
+const projectRoute = require("./routers/project");
 
 const DB = process.env.DATABASE;
+console.log(DB);
 
 
 mongoose
@@ -33,6 +35,7 @@ app.get("/", async (req, res) => {
 
 app.use("/", authRoute);
 app.use("/todo", todoRoute);
+app.use("/project", projectRoute);
 
 app.listen(port, () => {
   console.log(`connection is live at port no ${port}`);

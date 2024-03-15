@@ -107,7 +107,7 @@ router.post("/login", async (req, res) => {
 
 router.get("/getall", async (req, res) => {
   try {
-    const users = await Admin.find({}, "-password"); // Exclude password field from the response
+    const users = await Admin.find({}, "-password");
     res.status(200).json(users);
   } catch (error) {
     console.error(error);
@@ -157,6 +157,17 @@ router.post("/createemp", verifyToken, async (req, res) => {
     .catch((err) => {
       console.log(err, "Error in create employee");
     });
+});
+
+router.get("/getEmp", verifyToken, async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const users = await Employee.find({ companyId: userId }, "-password");
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 router.post("/change-password", verifyToken, async (req, res) => {

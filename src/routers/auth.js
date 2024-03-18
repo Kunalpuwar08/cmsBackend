@@ -170,6 +170,27 @@ router.get("/getEmp", verifyToken, async (req, res) => {
   }
 });
 
+router.get("/getEmp/:empId", verifyToken, async (req, res) => {
+  try {
+    const { companyId } = req.user;
+    const { empId } = req.params;
+
+    const employee = await Employee.findOne(
+      { _id: empId, companyId: companyId },
+      "-password"
+    );
+
+    if (!employee) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+
+    res.status(200).json(employee);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.post("/change-password", verifyToken, async (req, res) => {
   const { oldPassword, newPassword, confirmPassword } = req.body;
 

@@ -10,6 +10,7 @@ const todoRoute = require("./routers/todo");
 const projectRoute = require("./routers/project");
 const WDRoute = require("./routers/workingday");
 const leaveRoute = require("./routers/leave");
+const assetRoute = require("./routers/asset");
 
 const DB = process.env.DATABASE;
 
@@ -22,6 +23,8 @@ mongoose
   .catch((err) => {
     console.log("DB Connection Failed");
   });
+
+  module.exports = mongoose.connection;
 
 const ipMiddleware = require("express-ip");
 const { ipChecker } = require("./common");
@@ -39,6 +42,7 @@ app.use("/todo", todoRoute);
 app.use("/project", projectRoute);
 app.use("/", WDRoute);
 app.use("/", leaveRoute);
+app.use("/asset", assetRoute);
 
 app.listen(port, () => {
   console.log(`connection is live at port no ${port}`);

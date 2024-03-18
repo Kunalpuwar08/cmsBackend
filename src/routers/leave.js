@@ -41,9 +41,9 @@ router.post("/applyleave", verifyToken, async (req, res) => {
 //admin
 router.get("/listleaves", verifyToken, async (req, res) => {
   try {
-    const companyId = req.user?.userId;
+    const { userId } = req.user;
 
-    const leaves = await Leave.find({ companyId: companyId });
+    const leaves = await Leave.find({ companyId: userId });
 
     res.status(200).json(leaves);
   } catch (error) {

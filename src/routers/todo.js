@@ -9,7 +9,7 @@ const router = express.Router();
 //create TODO Employee
 router.post("/create", verifyToken, async (req, res) => {
   try {
-    const { userId, email, role, name, companyId, companyName } = req.user;
+    const { userId, email, name, companyId, companyName } = req.user;
     const { title, date, description } = req.body;
 
     if (!title || !date || !description) {

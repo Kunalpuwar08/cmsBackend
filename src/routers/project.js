@@ -1,105 +1,109 @@
 const express = require("express");
 const { verifyToken } = require("../common");
+const Project = require("../models/projectSchema");
 const router = express.Router();
 
-//--------------------Admin------------------------------
-//create Project
+// let gfs;
+// connection.once("open", () => {
+//   gfs = Grid(connection.db, mongoose.mongo);
+//   gfs.collection("uploads");
+// });
+
+// const storage = multer.memoryStorage();
+// const projectMedia = multer({ storage: storage });
+
 router.post("/create", verifyToken, async (req, res) => {
   try {
-    console.log(req.user, "req.user");
-    const { userId, email, name, role } = req.user;
     const {
-      projectName,
+      name,
       description,
-      startDate,
-      endDate,
-      attachment,
+      createdDate,
+      deadlineDate,
+      status,
+      priority,
+      type,
       assignTo,
     } = req.body;
+    const { userId } = req.user;
 
-    const Data = {
-      userId,
-      companyName: name,
-      projectName,
-      description,
-      startDate,
-      endDate,
-      attachment,
-      assignTo,
-    };
+    const fileUrls = [];
+    // if (req.files && req.files.length > 0) {
+    //   for (const file of req.files) {
+    //     const imageFileName = `${userId}_${Date.now()}_${file.originalname}`;
+    //     const writeStream = gfs.createWriteStream({
+    //       filename: imageFileName,
+    //     });
+    //     writeStream.write(file.buffer);
+    //     writeStream.end();
 
-    res.json(Data);
+    //     const fileUrl = `/file/${imageFileName}`;
+    //     fileUrls.push({ link: fileUrl, type: file.mimetype });
+    //   }
+    // }
+
+    const projectData = new Project({
+      name: name,
+      description: description,
+      createdDate: createdDate,
+      deadlineDate: deadlineDate,
+      companyId: userId,
+      status: status,
+      priority: priority,
+      task: [],
+      files: fileUrls,
+      type: type,
+      assignTo: assignTo,
+    });
+
+    await projectData
+      .save()
+      .then(() => {
+        res.status(201).json({ message: "Project created successfully" });
+      })
+      .catch(() => {
+        res.status(500).json({ error: "Project not created" });
+      });
+
+    res.status(201).json({
+      message: "Project added successfully",
+    });
   } catch (error) {
-    console.error(error, "Error in creating project");
-    res.status(500).json({ error: "Error in creating project" });
+    console.error("Error adding Project:", error);
+    res
+      .status(500)
+      .json({ error: "Error adding Project", message: error.message });
   }
 });
 
-// router.post("/projects", verifyToken, async (req, res) => {
-//     try {
-//       const { title, description } = req.body;
-//       const { userId } = req.user;
+router.delete("/delete/:projectId", verifyToken, async (req, res) => {
+  try {
+    const { projectId } = req.params;
 
-//       // Check if required fields are provided
-//       if (!title || !description) {
-//         return res.status(422).json({ error: "Please fill all required fields" });
-//       }
+    await Project.findByIdAndDelete(projectId);
 
-//       // Create the project
-//       const project = new Project({
-//         title,
-//         description,
-//         createdBy: userId
-//       });
+    res.status(200).json({ message: "Project deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting Project:", error);
+    res
+      .status(500)
+      .json({ error: "Error deleting Project", message: error.message });
+  }
+});
 
-//       await project.save();
+router.patch("/update/:projectId", verifyToken, async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const updateData = req.body;
 
-//       res.status(201).json({ message: "Project created successfully", project });
-//     } catch (error) {
-//       console.error(error, "Error in creating project");
-//       res.status(500).json({ error: "Error in creating project" });
-//     }
-//   });
+    await Project.findByIdAndUpdate(projectId, updateData);
 
-//   // Create a task within a project
-//   router.post("/projects/:projectId/tasks", verifyAdminToken, async (req, res) => {
-//     try {
-//       const { title, date, description, assignedTo, hours } = req.body;
-//       const { projectId } = req.params;
-
-//       // Check if required fields are provided
-//       if (!title || !date || !description || !assignedTo || !hours) {
-//         return res.status(422).json({ error: "Please fill all required fields" });
-//       }
-
-//       // Check if the project ID is valid
-//       if (!mongoose.Types.ObjectId.isValid(projectId)) {
-//         return res.status(400).json({ error: "Invalid project ID" });
-//       }
-
-//       // Check if the project exists
-//       const project = await Project.findById(projectId);
-//       if (!project) {
-//         return res.status(404).json({ error: "Project not found" });
-//       }
-
-//       // Create the task within the project
-//       const task = new Task({
-//         title,
-//         date,
-//         description,
-//         assignedTo,
-//         hours,
-//         projectId
-//       });
-
-//       await task.save();
-
-//       res.status(201).json({ message: "Task created successfully", task });
-//     } catch (error) {
-//       console.error(error, "Error in creating task");
-//       res.status(500).json({ error: "Error in creating task" });
-//     }
-//   });
+    res.status(200).json({ message: "Project updated successfully" });
+  } catch (error) {
+    console.error("Error updating Project:", error);
+    res
+      .status(500)
+      .json({ error: "Error updating Project", message: error.message });
+  }
+});
 
 module.exports = router;

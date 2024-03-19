@@ -110,6 +110,20 @@ router.delete("/remove/:id", verifyToken, async (req, res) => {
   }
 });
 
+router.get("/listAsset", verifyToken, async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const assignedAssets = await Asset.find({ companyId: userId });
+    res.status(200).json({ assets: assignedAssets });
+  } catch (error) {
+    console.error("Error getting assets:", error);
+    res.status(500).json({
+      error: "Error getting assets",
+      message: error.message,
+    });
+  }
+});
+
 //----------------------- EMP --------------------------------
 router.get("/get-asset", verifyToken, async (req, res) => {
   try {

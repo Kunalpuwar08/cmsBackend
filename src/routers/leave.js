@@ -3,6 +3,8 @@ const { verifyToken } = require("../common");
 const Leave = require("../models/leaveSchema");
 const router = express.Router();
 
+
+//----------------------------emp----------------------------
 router.post("/applyleave", verifyToken, async (req, res) => {
   try {
     const { startDate, endDate, reason, type } = req.body;
@@ -19,7 +21,7 @@ router.post("/applyleave", verifyToken, async (req, res) => {
       type: type,
       status: "pending",
     };
-    
+
     const leave = new Leave(leaveApplicationData);
     leave
       .save()

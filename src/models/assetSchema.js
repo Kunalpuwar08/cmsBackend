@@ -8,8 +8,9 @@ const assetSchema = new mongoose.Schema({
   description: { type: String, required: true },
   imageUrl: { type: String },
   companyId: { type: String, required: true },
-  assignTo: { type: Object },
-  status: { type: String}
+  assignTo: { type: Object, default: null },
+  status: { type: String, enum: ['available', 'assigned', 'pending'], default: 'available' },
+
 });
 
 const Asset = mongoose.model("ASSET", assetSchema);

@@ -58,8 +58,6 @@ router.post(
         serialNumber,
         companyId: userId,
         imageUrl,
-        assignTo:{},
-        status:'available'
       };
 
       const asset = new Asset(data);

@@ -58,6 +58,8 @@ router.post(
         serialNumber,
         companyId: userId,
         imageUrl,
+        assignTo:{},
+        status:'available'
       };
 
       const asset = new Asset(data);
@@ -84,6 +86,7 @@ router.post("/assign", verifyToken, async (req, res) => {
 
     await Asset.findByIdAndUpdate(assetId, {
       assignTo: { id: userId, name: userName },
+      status: 'in use'
     });
 
     res.status(200).json({ message: "Asset assigned successfully" });
@@ -114,7 +117,8 @@ router.get("/listAsset", verifyToken, async (req, res) => {
   try {
     const { userId } = req.user;
     const assignedAssets = await Asset.find({ companyId: userId });
-    res.status(200).json({ assets: assignedAssets });
+
+    res.status(200).json({ assignedAssets });
   } catch (error) {
     console.error("Error getting assets:", error);
     res.status(500).json({

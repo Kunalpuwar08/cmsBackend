@@ -9,6 +9,7 @@ const assetSchema = new mongoose.Schema({
   imageUrl: { type: String },
   companyId: { type: String, required: true },
   assignTo: { type: Object },
+  status: { type: String}
 });
 
 const Asset = mongoose.model("ASSET", assetSchema);

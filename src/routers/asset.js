@@ -1,64 +1,82 @@
 const express = require("express");
 const { verifyToken } = require("../common");
 const Asset = require("../models/assetSchema");
-const router = express.Router();
 
+const router = express.Router();
+const multer = require("multer");
+const { firestore, storage } = require("firebase-admin");
+
+const db = firestore();
+const bucket = storage().bucket();
+
+const multerstorage = multer.memoryStorage();
+const assetUpload = multer({ storage: multerstorage });
 
 //------------------------ ADMIN ---------------------------
-router.post("/create", verifyToken, async (req, res) => {
-  try {
-    const { name, type, brand, description } = req.body;
-    const userId = req.user.userId;
+router.post(
+  "/create",
+  assetUpload.single("image"),
+  verifyToken,
+  async (req, res) => {
+    try {
+      const { name, type, brand, description } = req.body;
+      const { userId } = req.user;
 
-    if (!userId || typeof userId !== "string" || userId.trim() === "") {
-      throw new Error("Invalid user ID");
+      if (!userId || typeof userId !== "string" || userId.trim() === "") {
+        throw new Error("Invalid user ID");
+      }
+
+      const currentDate = new Date();
+      const formattedDate = currentDate
+        .toISOString()
+        .slice(0, 10)
+        .replace(/-/g, "");
+      const randomNumber = Math.floor(Math.random() * 10000)
+        .toString()
+        .padStart(4, "0");
+      const serialNumber = `${formattedDate}-${randomNumber}`;
+
+      let imageUrl = null;
+      if (req.file) {
+        const imageFileName = `${userId}_${Date.now()}_${
+          req.file.originalname
+        }`;
+
+        const file = bucket.file(imageFileName);
+        await file.save(req.file.buffer, {
+          contentType: req.file.mimetype,
+          resumable: false,
+        });
+        imageUrl = `https://storage.googleapis.com/${bucket.name}/${imageFileName}`;
+      }
+
+      const data = {
+        name,
+        type,
+        brand,
+        description,
+        serialNumber,
+        companyId: userId,
+        imageUrl,
+      };
+
+      const asset = new Asset(data);
+      asset
+        .save()
+        .then(() => {
+          res.status(201).json({ message: "asset created successfully" });
+        })
+        .catch(() => {
+          res.status(500).json({ error: "asset not created" });
+        });
+    } catch (error) {
+      console.error("Error adding office asset:", error);
+      res
+        .status(500)
+        .json({ error: "Error adding office asset", message: error.message });
     }
-    let imageUrl = null;
-    const currentDate = new Date();
-    const formattedDate = currentDate
-      .toISOString()
-      .slice(0, 10)
-      .replace(/-/g, "");
-    const randomNumber = Math.floor(Math.random() * 10000)
-      .toString()
-      .padStart(4, "0");
-    const serialNumber = `${formattedDate}-${randomNumber}`;
-    // if (req.file) {
-    //   const imageFileName = `${userId}_${Date.now()}_${req.file.originalname}`;
-
-    //   const file = bucket.file(imageFileName);
-    //   await file.save(req.file.buffer, {
-    //     contentType: req.file.mimetype,
-    //     resumable: false,
-    //   });
-    //   imageUrl = `https://storage.googleapis.com/${bucket.name}/${imageFileName}`;
-    // }
-
-    const data = {
-      name,
-      type,
-      brand,
-      description,
-      serialNumber,
-      companyId: userId,
-    };
-
-    const asset = new Asset(data);
-    asset
-      .save()
-      .then(() => {
-        res.status(201).json({ message: "asset created successfully" });
-      })
-      .catch(() => {
-        res.status(500).json({ error: "asset not created" });
-      });
-  } catch (error) {
-    console.error("Error adding office asset:", error);
-    res
-      .status(500)
-      .json({ error: "Error adding office asset", message: error.message });
   }
-});
+);
 
 router.post("/assign", verifyToken, async (req, res) => {
   try {
@@ -102,12 +120,10 @@ router.get("/get-asset", verifyToken, async (req, res) => {
     res.status(200).json({ assets: assignedAssets });
   } catch (error) {
     console.error("Error fetching assigned assets:", error);
-    res
-      .status(500)
-      .json({
-        error: "Error fetching assigned assets",
-        message: error.message,
-      });
+    res.status(500).json({
+      error: "Error fetching assigned assets",
+      message: error.message,
+    });
   }
 });
 

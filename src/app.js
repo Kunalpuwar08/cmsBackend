@@ -1,6 +1,14 @@
 const mongoose = require("mongoose");
 const express = require("express");
+const admin = require("firebase-admin");
 require("dotenv").config();
+
+const credentials = require("../service.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(credentials),
+  storageBucket: process.env.STORAGEBUCKET,
+});
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,7 +22,6 @@ const assetRoute = require("./routers/asset");
 
 const DB = process.env.DATABASE;
 
-
 mongoose
   .connect(DB)
   .then(() => {
@@ -24,7 +31,7 @@ mongoose
     console.log("DB Connection Failed");
   });
 
-  module.exports = mongoose.connection;
+
 
 const ipMiddleware = require("express-ip");
 const { ipChecker } = require("./common");

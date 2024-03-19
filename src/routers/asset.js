@@ -47,6 +47,9 @@ router.post(
           contentType: req.file.mimetype,
           resumable: false,
         });
+
+        await file.makePublic();
+
         imageUrl = `https://storage.googleapis.com/${bucket.name}/${imageFileName}`;
       }
 

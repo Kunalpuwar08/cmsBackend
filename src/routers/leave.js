@@ -5,21 +5,21 @@ const router = express.Router();
 
 router.post("/applyleave", verifyToken, async (req, res) => {
   try {
-    const { employeeId, startDate, endDate, reason, type } = req.body;
-    const userId = req.user;
+    const { startDate, endDate, reason, type } = req.body;
+    const {companyName,companyId,userId,name} = req.user;
 
     const leaveApplicationData = {
-      companyName: userId.companyName,
-      companyId: userId.companyId,
-      employeeId: employeeId,
-      employeeName: userId.name,
+      companyName: companyName,
+      companyId: companyId,
+      employeeId: userId,
+      employeeName: name,
       startDate: startDate,
       endDate: endDate,
       reason: reason,
       type: type,
       status: "pending",
     };
-
+    
     const leave = new Leave(leaveApplicationData);
     leave
       .save()

@@ -105,6 +105,30 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.put("/updatetoken", verifyToken, async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { fcmToken } = req.body;
+
+    let user = await Employee.findById(userId);
+    if (!user) {
+      user = await Admin.findById(userId);
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.fcmToken = fcmToken;
+    await user.save();
+
+    res.status(200).json({ message: "FCM token updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.get("/getall", async (req, res) => {
   try {
     const users = await Admin.find({}, "-password");

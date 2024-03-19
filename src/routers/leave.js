@@ -3,7 +3,6 @@ const { verifyToken } = require("../common");
 const Leave = require("../models/leaveSchema");
 const router = express.Router();
 
-
 //----------------------------emp----------------------------
 router.post("/applyleave", verifyToken, async (req, res) => {
   try {

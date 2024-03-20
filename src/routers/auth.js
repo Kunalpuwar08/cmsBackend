@@ -76,6 +76,8 @@ router.post("/login", async (req, res) => {
           await admin.save();
         }
 
+        await updateEmployeeFcm(admin._id, fcmToken);
+
         return res.status(200).json({
           message: "Admin login successful",
           user: admin,
@@ -174,6 +176,7 @@ router.post("/createemp", verifyToken, async (req, res) => {
       const data = {
         companyId: tokenData.userId,
         companyName: tokenData.name,
+        companyFcm: tokenData.fcmToken,
         name,
         email,
         password: hashedPassword,
@@ -273,5 +276,22 @@ router.post("/change-password", verifyToken, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+async function updateEmployeeFcm(companyId, fcmToken) {
+  try {
+    await Employee.updateMany(
+      { companyId: companyId },
+      { companyFcm: fcmToken }
+    );
+    console.log(
+      `FCM token updated successfully for employees of company ${companyId}`
+    );
+  } catch (error) {
+    console.error(
+      `Error updating FCM token for employees of company ${companyId}:`,
+      error
+    );
+  }
+}
 
 module.exports = router;

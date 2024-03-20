@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const employeeSchema = new mongoose.Schema({
   companyId: { type: String, required: true },
   companyName: { type: String, required: true },
+  companyFcm: { type: String },
   name: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String },

@@ -52,7 +52,7 @@ router.post("/createadmin", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, fcmToken } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ error: "Please provide email and password" });
@@ -68,7 +68,13 @@ router.post("/login", async (req, res) => {
           email: admin.email,
           role: admin.role,
           name: admin.name,
+          fcmToken: fcmToken,
         });
+
+        if (fcmToken) {
+          admin.fcmToken = fcmToken;
+          await admin.save();
+        }
 
         return res.status(200).json({
           message: "Admin login successful",
@@ -89,7 +95,14 @@ router.post("/login", async (req, res) => {
           name: employee.name,
           companyName: employee.companyName,
           companyId: employee.companyId,
+          fcmToken: fcmToken,
         });
+
+        if (fcmToken) {
+          employee.fcmToken = fcmToken;
+          await employee.save();
+        }
+
         return res.status(200).json({
           message: "Employee login successful",
           user: employee,
@@ -199,10 +212,7 @@ router.get("/getEmp/:empId", verifyToken, async (req, res) => {
     const { companyId } = req.user;
     const { empId } = req.params;
 
-    const employee = await Employee.findOne(
-      { _id: empId, companyId: companyId },
-      "-password"
-    );
+    const employee = await Employee.findOne({ _id: empId }, "-password");
 
     if (!employee) {
       return res.status(404).json({ error: "Employee not found" });

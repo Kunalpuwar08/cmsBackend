@@ -2,12 +2,13 @@ const express = require("express");
 const { verifyToken } = require("../common");
 const Leave = require("../models/leaveSchema");
 const router = express.Router();
+const { messaging } = require("firebase-admin");
 
 //----------------------------emp----------------------------
 router.post("/applyleave", verifyToken, async (req, res) => {
   try {
-    const { startDate, endDate, reason, type } = req.body;
-    const {companyName,companyId,userId,name} = req.user;
+    const { startDate, endDate, reason, type, companyFcm } = req.body;
+    const { companyName, companyId, userId, name } = req.user;
 
     const leaveApplicationData = {
       companyName: companyName,
@@ -24,8 +25,16 @@ router.post("/applyleave", verifyToken, async (req, res) => {
     const leave = new Leave(leaveApplicationData);
     leave
       .save()
-      .then(() => {
+      .then(async () => {
         res.status(201).json({ message: "Leave created successfully" });
+        const message = {
+          notification: {
+            title: "New Leave Application",
+            body: "You have a new leave application to review",
+          },
+          token: companyFcm,
+        };
+        await messaging().send(message);
       })
       .catch(() => {
         res.status(500).json({ error: "Leave not created" });

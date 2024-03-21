@@ -228,6 +228,33 @@ router.get("/getEmp/:empId", verifyToken, async (req, res) => {
   }
 });
 
+router.put("/updateProfile/:empId", verifyToken, async (req, res) => {
+  try {
+    const { empId } = req.params;
+    const updateFields = req.body;
+
+    const updatedEmployee = await Employee.findByIdAndUpdate(
+      empId,
+      updateFields,
+      { new: true }
+    );
+
+    if (!updatedEmployee) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+
+    res
+      .status(200)
+      .json({
+        message: "Profile updated successfully",
+        employee: updatedEmployee,
+      });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.post("/change-password", verifyToken, async (req, res) => {
   const { oldPassword, newPassword, confirmPassword } = req.body;
 

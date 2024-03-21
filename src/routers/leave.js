@@ -81,7 +81,7 @@ router.post("/updateleave/:leaveId", verifyToken, async (req, res) => {
       },
       token: fcmToken,
     };
-    
+
     await messaging().send(message);
   } catch (error) {
     console.error("Error updating leave status:", error);

@@ -3,15 +3,15 @@ const mongoose = require("mongoose");
 const employeeSchema = new mongoose.Schema({
   companyId: { type: String, required: true },
   companyName: { type: String, required: true },
-  companyFcm: { type: String },
+  companyFcm: { type: String, default: null },
   name: { type: String, required: true },
   email: { type: String, required: true },
-  password: { type: String },
-  address: { type: String },
-  phone: { type: String },
-  role: { type: String },
+  password: { type: String, default: null },
+  address: { type: String, default: null },
+  phone: { type: String, default: null },
+  role: { type: String, default: null },
   isPasswordChanged: { type: Boolean },
-  fcmToken: { type: String },
+  fcmToken: { type: String, default: null },
 });
 
 const Employee = mongoose.model("EMPLOYEE", employeeSchema);

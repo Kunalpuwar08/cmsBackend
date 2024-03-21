@@ -8,7 +8,7 @@ const { messaging } = require("firebase-admin");
 router.post("/applyleave", verifyToken, async (req, res) => {
   try {
     const { startDate, endDate, reason, type, companyFcm } = req.body;
-    const { companyName, companyId, userId, name } = req.user;
+    const { companyName, companyId, userId, name, fcmToken } = req.user;
 
     const leaveApplicationData = {
       companyName: companyName,
@@ -20,6 +20,7 @@ router.post("/applyleave", verifyToken, async (req, res) => {
       reason: reason,
       type: type,
       status: "pending",
+      employeeFcm: fcmToken,
     };
 
     const leave = new Leave(leaveApplicationData);
@@ -68,11 +69,20 @@ router.get("/listleaves", verifyToken, async (req, res) => {
 router.post("/updateleave/:leaveId", verifyToken, async (req, res) => {
   try {
     const { leaveId } = req.params;
-    const { status } = req.body;
+    const { status, fcmToken } = req.body;
 
     await Leave.findByIdAndUpdate(leaveId, { status: status });
 
     res.status(200).json({ message: "Leave status updated successfully" });
+    const message = {
+      notification: {
+        title: "Leave Application",
+        body: `Your leave application is ${status}ed`,
+      },
+      token: fcmToken,
+    };
+    
+    await messaging().send(message);
   } catch (error) {
     console.error("Error updating leave status:", error);
     res.status(500).json({

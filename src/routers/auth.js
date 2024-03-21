@@ -120,6 +120,39 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.post("/logout", async (req, res) => {
+  try {
+    const { userId, userType } = req.body;
+    if (!userId || !userType) {
+      return res.status(400).json({ error: "Please provide user ID and user type" });
+    }
+
+    if (userType === 'admin') {
+      const admin = await Admin.findById(userId);
+      if (!admin) {
+        return res.status(404).json({ error: "Admin not found" });
+      }
+      admin.fcmToken = null;
+      await admin.save();
+    } else if (userType === 'employee') {
+      const employee = await Employee.findById(userId);
+      if (!employee) {
+        return res.status(404).json({ error: "Employee not found" });
+      }
+      employee.fcmToken = null;
+      await employee.save();
+    } else {
+      return res.status(400).json({ error: "Invalid user type" });
+    }
+
+    return res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
 router.put("/updatetoken", verifyToken, async (req, res) => {
   try {
     const { userId } = req.user;

@@ -3,6 +3,7 @@ const { verifyToken } = require("../common");
 const Leave = require("../models/leaveSchema");
 const router = express.Router();
 const { messaging } = require("firebase-admin");
+const Notification = require("../models/notificationSchema");
 
 //----------------------------emp----------------------------
 router.post("/applyleave", verifyToken, async (req, res) => {
@@ -28,6 +29,18 @@ router.post("/applyleave", verifyToken, async (req, res) => {
       .save()
       .then(async () => {
         res.status(201).json({ message: "Leave created successfully" });
+
+        const notificationData = {
+          title: "New Leave Application",
+          body: "You have a new leave application to review",
+          recipientId: companyId,
+          type: "leave_application",
+          relatedObjectId: leave._id,
+        };
+
+        const notification = new Notification(notificationData);
+        await notification.save();
+
         const message = {
           notification: {
             title: "New Leave Application",

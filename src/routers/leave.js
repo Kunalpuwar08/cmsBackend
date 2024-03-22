@@ -62,6 +62,22 @@ router.post("/applyleave", verifyToken, async (req, res) => {
   }
 });
 
+router.get("/emplistleave", verifyToken, async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    const leaves = await Leave.find({ employeeId: userId });
+
+    res.status(200).json(leaves);
+  } catch (error) {
+    console.error("Error fetching leaves by company ID:", error);
+    res.status(500).json({
+      error: "Error fetching leaves by company ID",
+      message: error.message,
+    });
+  }
+});
+
 //admin
 router.get("/listleaves", verifyToken, async (req, res) => {
   try {

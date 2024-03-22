@@ -31,6 +31,7 @@ const projectRoute = require("./routers/project");
 const WDRoute = require("./routers/workingday");
 const leaveRoute = require("./routers/leave");
 const assetRoute = require("./routers/asset");
+const NotiRoute = require("./routers/notification");
 
 const DB = process.env.DATABASE;
 
@@ -60,6 +61,7 @@ app.use("/project", projectRoute);
 app.use("/", WDRoute);
 app.use("/", leaveRoute);
 app.use("/asset", assetRoute);
+app.use("/", NotiRoute);
 
 app.listen(port, () => {
   console.log(`connection is live at port no ${port}`);

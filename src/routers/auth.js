@@ -235,7 +235,7 @@ router.post("/createemp", verifyToken, async (req, res) => {
 router.get("/getEmp", verifyToken, async (req, res) => {
   try {
     const { userId } = req.user;
-    const users = await Employee.find({ companyId: userId }, "-password");
+    const users = await Employee.find({ companyId: userId }, "name");
     res.status(200).json(users);
   } catch (error) {
     console.error(error);

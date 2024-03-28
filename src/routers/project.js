@@ -108,4 +108,19 @@ router.patch("/update/:projectId", verifyToken, async (req, res) => {
   }
 });
 
+//---------------------------Employee---------------------------
+
+router.get("/list", verifyToken, async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const projects = await Project.find({ assignTo: userId }).exec();
+    res.status(200).json({ projects });
+  } catch (error) {
+    console.error("Error retrieving projects:", error);
+    res.status(500).json({ error: "Error retrieving projects", message: error.message });
+  }
+});
+
+
+
 module.exports = router;

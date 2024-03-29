@@ -47,7 +47,7 @@ function verifyToken(req, res, next) {
 }
 
 function generateToken(data) {
-  return jwt.sign(data, jwtKey, { expiresIn: "1w" });
+  return jwt.sign(data, jwtKey, { expiresIn: "1h" });
 }
 
 function ipChecker(req, res, next) {

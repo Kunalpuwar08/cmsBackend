@@ -108,6 +108,21 @@ router.patch("/update/:projectId", verifyToken, async (req, res) => {
   }
 });
 
+router.get("/admin-list", verifyToken, async (req, res) => {
+  try {
+    const { userId, role } = req.user;
+    if (role === 'admin') {
+      const projects = await Project.find({ companyId: userId }).exec();
+      res.status(200).json({ projects });
+    } else {
+      res.status(403).json({ error: "Access forbidden. Only admins can access this route." });
+    }
+  } catch (error) {
+    console.error("Error retrieving all projects for admin:", error);
+    res.status(500).json({ error: "Error retrieving all projects", message: error.message });
+  }
+});
+
 //---------------------------Employee---------------------------
 
 router.get("/list", verifyToken, async (req, res) => {

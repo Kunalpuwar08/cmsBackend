@@ -3,6 +3,7 @@ const router = express.Router();
 const Leave = require("../models/leaveSchema");
 const Asset = require("../models/assetSchema");
 const Project = require("../models/projectSchema");
+const Employee = require("../models/employeeSchema");
 const { verifyToken } = require("../common");
 
 router.get("/dashboard", verifyToken, async (req, res) => {
@@ -13,6 +14,7 @@ router.get("/dashboard", verifyToken, async (req, res) => {
     const leaveCount = await Leave.countDocuments({ companyId: userId });
 
     const assetCount = await Asset.countDocuments({ companyId: userId });
+    const employeeCount = await Employee.countDocuments({ companyId: userId });
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -26,6 +28,7 @@ router.get("/dashboard", verifyToken, async (req, res) => {
       projectCount,
       leaveCount,
       assetCount,
+      employeeCount,
       activeLeaveCount,
     });
   } catch (error) {

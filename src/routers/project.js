@@ -130,8 +130,9 @@ router.get("/admin-list", verifyToken, async (req, res) => {
 
 router.get("/list", verifyToken, async (req, res) => {
   try {
-    const { userId } = req.user;
-    const projects = await Project.find({ assignTo: userId }).exec();
+    const { name } = req.user;
+    console.log(name,"name");
+    const projects = await Project.find({ assignTo: name }).exec();
     res.status(200).json({ projects });
   } catch (error) {
     console.error("Error retrieving projects:", error);

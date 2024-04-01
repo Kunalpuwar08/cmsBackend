@@ -142,4 +142,18 @@ router.get("/list", verifyToken, async (req, res) => {
   }
 });
 
+router.get("/listProject", verifyToken, async (req, res) => {
+  try {
+    const { name } = req.user;
+    console.log(name, "name");
+    const projects = await Project.find({ assignTo: name })
+      .select("name assignTo")
+      .exec();
+    res.status(200).json({ projects });
+  } catch (error) {
+    console.error("Error retrieving projects:", error);
+    res.status(500).json({ error: "Error retrieving projects", message: error.message });
+  }
+});
+
 module.exports = router;

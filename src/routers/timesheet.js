@@ -60,8 +60,6 @@ const router = express.Router();
 
 // module.exports = router;
 
-
-
 router.post("/create", verifyToken, async (req, res) => {
   try {
     const { projectId, date, hours, description } = req.body;
@@ -86,22 +84,25 @@ router.post("/create", verifyToken, async (req, res) => {
     res.status(201).json({ message: "Timesheet created successfully" });
   } catch (error) {
     console.error("Error creating Timesheet:", error);
-    res.status(500).json({ error: "Error creating Timesheet", message: error.message });
+    res
+      .status(500)
+      .json({ error: "Error creating Timesheet", message: error.message });
   }
 });
 
-router.get("/list/:userId", verifyToken, async (req, res) => {
+router.get("/list", verifyToken, async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.user;
 
     const timesheets = await Timesheet.find({ userId });
 
     res.status(200).json(timesheets);
   } catch (error) {
     console.error("Error retrieving Timesheets:", error);
-    res.status(500).json({ error: "Error retrieving Timesheets", message: error.message });
+    res
+      .status(500)
+      .json({ error: "Error retrieving Timesheets", message: error.message });
   }
 });
-
 
 module.exports = router;

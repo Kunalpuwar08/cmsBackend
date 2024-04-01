@@ -4,7 +4,7 @@ const Project = require("../models/projectSchema");
 const router = express.Router();
 
 const multer = require("multer");
-const { getStorage, ref, uploadBytes } = require("firebase-admin/storage");
+const { getStorage } = require("firebase-admin/storage");
 
 const multerstorage = multer.memoryStorage();
 const attachments = multer({ storage: multerstorage });
@@ -42,8 +42,6 @@ router.post(
         const downloadURL = `https://storage.googleapis.com/${bucket.name}/${imageFileName}`;
         fileUrls.push(downloadURL);
       }
-
-      console.log(fileUrls,"fileUrls");
 
       const projectData = new Project({
         name: name,

@@ -9,8 +9,8 @@ const projectSchema = new mongoose.Schema({
   companyId: { type: String },
   status: { type: String, required: true },
   priority: { type: String, required: true },
-  task: { type: String, default: [] },
-  files: { type: Array, default: [] },
+  task: { type: [String], default: [] },
+  files: { type: [String], default: []},
   type: { type: String, required: true },
   assignTo: { type: String, required: true },
 });

@@ -57,14 +57,15 @@ router.post(
         assignTo: assignTo,
       });
 
+      console.log(projectData,"projectData");
 
       projectData
         .save()
         .then(() => {
           res.status(201).json({ message: "Project created successfully" });
         })
-        .catch(() => {
-          res.status(500).json({ error: "Project not created" });
+        .catch((err) => {
+          res.status(500).json({ error: "Project not created",err:err });
         });
     } catch (error) {
       console.error("Error adding Project:", error);
@@ -109,15 +110,19 @@ router.patch("/update/:projectId", verifyToken, async (req, res) => {
 router.get("/admin-list", verifyToken, async (req, res) => {
   try {
     const { userId, role } = req.user;
-    if (role === 'admin') {
+    if (role === "admin") {
       const projects = await Project.find({ companyId: userId }).exec();
       res.status(200).json({ projects });
     } else {
-      res.status(403).json({ error: "Access forbidden. Only admins can access this route." });
+      res.status(403).json({
+        error: "Access forbidden. Only admins can access this route.",
+      });
     }
   } catch (error) {
     console.error("Error retrieving all projects for admin:", error);
-    res.status(500).json({ error: "Error retrieving all projects", message: error.message });
+    res
+      .status(500)
+      .json({ error: "Error retrieving all projects", message: error.message });
   }
 });
 
@@ -130,10 +135,10 @@ router.get("/list", verifyToken, async (req, res) => {
     res.status(200).json({ projects });
   } catch (error) {
     console.error("Error retrieving projects:", error);
-    res.status(500).json({ error: "Error retrieving projects", message: error.message });
+    res
+      .status(500)
+      .json({ error: "Error retrieving projects", message: error.message });
   }
 });
-
-
 
 module.exports = router;

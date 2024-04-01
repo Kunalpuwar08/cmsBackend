@@ -67,11 +67,11 @@ router.post("/create", verifyToken, async (req, res) => {
     const { projectId, date, hours, description } = req.body;
     const { userId } = req.user;
 
-    const existingTimesheet = await Timesheet.findOne({ userId, date });
+    // const existingTimesheet = await Timesheet.findOne({ userId, date });
 
-    if (existingTimesheet) {
-      return res.status(400).json({ error: "Timesheet already exists for this user and date" });
-    }
+    // if (existingTimesheet) {
+    //   return res.status(400).json({ error: "Timesheet already exists for this user and date" });
+    // }
 
     const timesheet = new Timesheet({
       projectId,
@@ -90,11 +90,11 @@ router.post("/create", verifyToken, async (req, res) => {
   }
 });
 
-router.get("/list/:userId/:date", verifyToken, async (req, res) => {
+router.get("/list/:userId", verifyToken, async (req, res) => {
   try {
-    const { userId, date } = req.params;
+    const { userId } = req.params;
 
-    const timesheets = await Timesheet.find({ userId, date });
+    const timesheets = await Timesheet.find({ userId });
 
     res.status(200).json(timesheets);
   } catch (error) {
@@ -102,4 +102,6 @@ router.get("/list/:userId/:date", verifyToken, async (req, res) => {
     res.status(500).json({ error: "Error retrieving Timesheets", message: error.message });
   }
 });
+
+
 module.exports = router;

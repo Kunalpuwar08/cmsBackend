@@ -131,7 +131,6 @@ router.get("/admin-list", verifyToken, async (req, res) => {
 router.get("/list", verifyToken, async (req, res) => {
   try {
     const { name } = req.user;
-    console.log(name,"name");
     const projects = await Project.find({ assignTo: name }).exec();
     res.status(200).json({ projects });
   } catch (error) {
@@ -145,7 +144,6 @@ router.get("/list", verifyToken, async (req, res) => {
 router.get("/listProject", verifyToken, async (req, res) => {
   try {
     const { name } = req.user;
-    console.log(name, "name");
     const projects = await Project.find({ assignTo: name })
       .select("name assignTo")
       .exec();

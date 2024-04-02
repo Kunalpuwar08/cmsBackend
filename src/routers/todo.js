@@ -38,7 +38,39 @@ router.post("/create", verifyToken, async (req, res) => {
   }
 });
 
-//list of created TODOS For Employee with ID
+router.patch("/update/:todoId", verifyToken, async (req, res) => {
+  try {
+    const { userId, companyId } = req.user;
+    const { title, date, description, status } = req.body;
+    const { todoId } = req.params;
+
+    if (!title || !date || !description) {
+      return res.status(422).json({ error: "Please fill all required fields" });
+    }
+
+    const updatedData = {
+      userId,
+      title,
+      date,
+      description,
+      status,
+      companyId,
+    };
+
+    const updatedTodo = await Todo.findByIdAndUpdate(todoId, updatedData);
+
+    if (!updatedTodo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    res.status(200).json({ message: "Todo updated successfully" });
+  } catch (error) {
+    console.error("Error updating Todo:", error);
+    res.status(500).json({ error: "Error updating Todo", message: error.message });
+  }
+});
+
+
 router.get("/list-todo", verifyToken, async (req, res) => {
   try {
     const { userId } = req.user;
@@ -55,7 +87,6 @@ router.get("/list-todo", verifyToken, async (req, res) => {
   }
 });
 
-//delete Todo by id
 router.delete("/delete/:id", verifyToken, async (req, res) => {
   try {
     const id = req.params.id;

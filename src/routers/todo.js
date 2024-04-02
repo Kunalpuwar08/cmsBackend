@@ -16,7 +16,9 @@ router.post("/create", verifyToken, async (req, res) => {
     const existingTodo = await Todo.findOne({ userId, date });
 
     if (existingTodo) {
-      return res.status(400).json({ error: "A Todo already exists for this date" });
+      return res
+        .status(400)
+        .json({ error: "A Todo already exists for this date" });
     }
 
     const data = {
@@ -71,10 +73,11 @@ router.patch("/update/:todoId", verifyToken, async (req, res) => {
     res.status(200).json({ message: "Todo updated successfully" });
   } catch (error) {
     console.error("Error updating Todo:", error);
-    res.status(500).json({ error: "Error updating Todo", message: error.message });
+    res
+      .status(500)
+      .json({ error: "Error updating Todo", message: error.message });
   }
 });
-
 
 router.get("/list-todo", verifyToken, async (req, res) => {
   try {
@@ -111,5 +114,51 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
 });
 
 //------------------------Admin--------------------------------
+// router.get("/admin-todo-list", verifyToken, async (req, res) => {
+//   try {
+//     const { userId } = req.user;
+//     const todo = await Todo.find({ companyId: userId });
+
+//     if (!todo) {
+//       return res.status(404).json({ error: "Todo not found" });
+//     }
+
+//     res.json(todo);
+//   } catch (error) {
+//     console.log(error, "Error in fetching todo");
+//     res.status(500).json({ error: "Error in fetching todo" });
+//   }
+// });
+
+router.get("/admin-todo-list", verifyToken, async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    // Aggregate pipeline to group todo items by employee
+    const todosByEmployee = await Todo.aggregate([
+      {
+        $match: { companyId: userId },
+      },
+      {
+        $group: {
+          _id: "$userId",
+          todos: { $push: "$$ROOT" },
+        },
+      },
+    ]);
+    const employeesWithTodos = [];
+
+    todosByEmployee.forEach((employee) => {
+      const { _id, name, todos } = employee;
+      console.log(employee);
+      employeesWithTodos.push({ userId: _id, name: todos[0].name, todos });
+    });
+
+    res.json(employeesWithTodos);
+  } catch (error) {
+    console.log(error, "Error in fetching todo");
+    res.status(500).json({ error: "Error in fetching todo" });
+  }
+});
 
 module.exports = router;

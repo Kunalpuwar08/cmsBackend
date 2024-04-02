@@ -13,6 +13,12 @@ router.post("/create", verifyToken, async (req, res) => {
       return res.status(422).json({ error: "Please fill all required field" });
     }
 
+    const existingTodo = await Todo.findOne({ userId, date });
+
+    if (existingTodo) {
+      return res.status(400).json({ error: "A Todo already exists for this date" });
+    }
+
     const data = {
       userId,
       email,

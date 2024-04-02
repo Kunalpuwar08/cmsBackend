@@ -41,17 +41,16 @@ router.post("/create", verifyToken, async (req, res) => {
 router.patch("/update/:todoId", verifyToken, async (req, res) => {
   try {
     const { userId, companyId } = req.user;
-    const { title, date, description, status } = req.body;
+    const { title, description, status } = req.body;
     const { todoId } = req.params;
 
-    if (!title || !date || !description) {
+    if (!title || !description) {
       return res.status(422).json({ error: "Please fill all required fields" });
     }
 
     const updatedData = {
       userId,
       title,
-      date,
       description,
       status,
       companyId,

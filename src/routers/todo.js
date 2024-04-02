@@ -3,14 +3,11 @@ const { verifyToken } = require("../common");
 const Todo = require("../models/todosSchems");
 const router = express.Router();
 
-
 //------------------------Employeee-------------------------
-
-//create TODO Employee
 router.post("/create", verifyToken, async (req, res) => {
   try {
     const { userId, email, name, companyId, companyName } = req.user;
-    const { title, date, description } = req.body;
+    const { title, date, description, status } = req.body;
 
     if (!title || !date || !description) {
       return res.status(422).json({ error: "Please fill all required field" });
@@ -23,7 +20,7 @@ router.post("/create", verifyToken, async (req, res) => {
       title,
       date,
       description,
-      status: "todo",
+      status,
       companyId,
       companyName,
     };
@@ -78,7 +75,5 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
 });
 
 //------------------------Admin--------------------------------
-
-
 
 module.exports = router;

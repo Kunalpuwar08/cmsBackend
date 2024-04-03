@@ -10,6 +10,7 @@ const todosSchema = new mongoose.Schema({
   description: { type: String, required: true },
   companyName: { type: String },
   companyId: { type: String },
+  estimationHours: { type: Number, require: true },
 });
 
 const Todo = mongoose.model("TODO", todosSchema);

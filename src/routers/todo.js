@@ -7,30 +7,23 @@ const router = express.Router();
 router.post("/create", verifyToken, async (req, res) => {
   try {
     const { userId, email, name, companyId, companyName } = req.user;
-    const { title, date, description, status } = req.body;
+    const { title, date, description, estimationHours } = req.body;
 
-    if (!title || !date || !description) {
+    if (!title || !date || !description || !estimationHours) {
       return res.status(422).json({ error: "Please fill all required field" });
     }
 
-    const existingTodo = await Todo.findOne({ userId, date });
-
-    if (existingTodo) {
-      return res
-        .status(400)
-        .json({ error: "A Todo already exists for this date" });
-    }
-
     const data = {
-      userId,
-      email,
       name,
-      title,
       date,
-      description,
-      status,
+      email,
+      title,
+      userId,
+      status:'todo',
       companyId,
+      description,
       companyName,
+      estimationHours,
     };
 
     const Todos = new Todo(data);
@@ -114,27 +107,11 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
 });
 
 //------------------------Admin--------------------------------
-// router.get("/admin-todo-list", verifyToken, async (req, res) => {
-//   try {
-//     const { userId } = req.user;
-//     const todo = await Todo.find({ companyId: userId });
-
-//     if (!todo) {
-//       return res.status(404).json({ error: "Todo not found" });
-//     }
-
-//     res.json(todo);
-//   } catch (error) {
-//     console.log(error, "Error in fetching todo");
-//     res.status(500).json({ error: "Error in fetching todo" });
-//   }
-// });
 
 router.get("/admin-todo-list", verifyToken, async (req, res) => {
   try {
     const { userId } = req.user;
 
-    // Aggregate pipeline to group todo items by employee
     const todosByEmployee = await Todo.aggregate([
       {
         $match: { companyId: userId },
@@ -149,8 +126,8 @@ router.get("/admin-todo-list", verifyToken, async (req, res) => {
     const employeesWithTodos = [];
 
     todosByEmployee.forEach((employee) => {
-      const { _id, name, todos } = employee;
-      console.log(employee);
+      const { _id, todos } = employee;
+
       employeesWithTodos.push({ userId: _id, name: todos[0].name, todos });
     });
 

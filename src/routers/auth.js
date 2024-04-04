@@ -279,6 +279,7 @@ router.put(
   verifyToken,
   async (req, res) => {
     try {
+      const { userId } = req.user;
       const { empId } = req.params;
       const updateFields = req.body;
 

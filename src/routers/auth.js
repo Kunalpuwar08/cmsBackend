@@ -3,6 +3,14 @@ const router = express.Router();
 const Admin = require("../models/userSchema");
 const Employee = require("../models/employeeSchema");
 const bcrypt = require("bcryptjs");
+
+const multer = require("multer");
+const { storage } = require("firebase-admin");
+
+const bucket = storage().bucket();
+const multerstorage = multer.memoryStorage();
+const profileUpload = multer({ storage: multerstorage });
+
 const {
   generateRandomPassword,
   sendCredentialsByEmail,
@@ -124,17 +132,19 @@ router.post("/logout", async (req, res) => {
   try {
     const { userId, userType } = req.body;
     if (!userId || !userType) {
-      return res.status(400).json({ error: "Please provide user ID and user type" });
+      return res
+        .status(400)
+        .json({ error: "Please provide user ID and user type" });
     }
 
-    if (userType === 'admin') {
+    if (userType === "admin") {
       const admin = await Admin.findById(userId);
       if (!admin) {
         return res.status(404).json({ error: "Admin not found" });
       }
       admin.fcmToken = null;
       await admin.save();
-    } else if (userType === 'employee') {
+    } else if (userType === "employee") {
       const employee = await Employee.findById(userId);
       if (!employee) {
         return res.status(404).json({ error: "Employee not found" });
@@ -151,7 +161,6 @@ router.post("/logout", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
 
 router.put("/updatetoken", verifyToken, async (req, res) => {
   try {
@@ -235,7 +244,10 @@ router.post("/createemp", verifyToken, async (req, res) => {
 router.get("/getEmp", verifyToken, async (req, res) => {
   try {
     const { userId } = req.user;
-    const users = await Employee.find({ companyId: userId }, "name email fcmToken");
+    const users = await Employee.find(
+      { companyId: userId },
+      "name email fcmToken"
+    );
     res.status(200).json(users);
   } catch (error) {
     console.error(error);
@@ -261,32 +273,51 @@ router.get("/getEmp/:empId", verifyToken, async (req, res) => {
   }
 });
 
-router.put("/updateProfile/:empId", verifyToken, async (req, res) => {
-  try {
-    const { empId } = req.params;
-    const updateFields = req.body;
+router.put(
+  "/updateProfile/:empId",
+  profileUpload.single("image"),
+  verifyToken,
+  async (req, res) => {
+    try {
+      const { empId } = req.params;
+      const updateFields = req.body;
 
-    const updatedEmployee = await Employee.findByIdAndUpdate(
-      empId,
-      updateFields,
-      { new: true }
-    );
+      let imageUrl = null;
+      if (req.file) {
+        const imageFileName = `${userId}_${Date.now()}_${
+          req.file.originalname
+        }`;
 
-    if (!updatedEmployee) {
-      return res.status(404).json({ error: "Employee not found" });
-    }
+        const file = bucket.file(imageFileName);
+        await file.save(req.file.buffer, {
+          contentType: req.file.mimetype,
+          resumable: false,
+        });
 
-    res
-      .status(200)
-      .json({
+        await file.makePublic();
+
+        imageUrl = `https://storage.googleapis.com/${bucket.name}/${imageFileName}`;
+      }
+
+      const updatedEmployee = await Employee.findByIdAndUpdate(
+        empId,
+        { ...updateFields, profileimageUrl: imageUrl },
+        { new: true }
+      );
+
+      if (!updatedEmployee) {
+        return res.status(404).json({ error: "Employee not found" });
+      }
+      res.status(200).json({
         message: "Profile updated successfully",
         employee: updatedEmployee,
       });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
-});
+);
 
 router.post("/change-password", verifyToken, async (req, res) => {
   const { oldPassword, newPassword, confirmPassword } = req.body;

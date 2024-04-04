@@ -12,6 +12,7 @@ const employeeSchema = new mongoose.Schema({
   role: { type: String, default: null },
   isPasswordChanged: { type: Boolean },
   fcmToken: { type: String, default: null },
+  profileimageUrl: { type: String },
 });
 
 const Employee = mongoose.model("EMPLOYEE", employeeSchema);

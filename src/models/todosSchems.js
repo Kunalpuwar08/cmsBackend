@@ -11,6 +11,12 @@ const todosSchema = new mongoose.Schema({
   companyName: { type: String },
   companyId: { type: String },
   estimationHours: { type: Number, require: true },
+  isStarted: { type: Boolean },
+  startTime: { type: String },
+  isPaused: { type: Boolean, default: false },
+  remainingHours: { type: String },
+  isCompleted: { type: Boolean },
+  pauseTime: {type: Number}
 });
 
 const Todo = mongoose.model("TODO", todosSchema);

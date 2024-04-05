@@ -27,8 +27,8 @@ router.get("/chatList", verifyToken, async (req, res) => {
 
 router.post("/send", verifyToken, async (req, res) => {
   try {
-    const { userId, companyId } = req.user;
-    const { receiverId, message } = req.body;
+    const { userId, companyId, name } = req.user;
+    const { receiverId, receiverName, message } = req.body;
 
     const receiver = await Employee.findOne({
       _id: receiverId,
@@ -39,17 +39,16 @@ router.post("/send", verifyToken, async (req, res) => {
     }
 
     const newMessage = new Message({
-      sender: userId,
-      receiver: receiverId,
+      sender: { _id: userId, name: name },
+      receiver: { _id: receiverId, name: receiverName },
       message: message,
     });
     await newMessage.save();
 
-    // You can also send push notifications to the receiver if needed
     const notiMessage = {
       notification: {
-        title: receiverId,
-        body: `You have a new message from ${userId}`,
+        title: receiverName,
+        body: `You have a new message from ${name}`,
       },
       token: receiver.fcmToken,
     };
@@ -64,26 +63,26 @@ router.post("/send", verifyToken, async (req, res) => {
 });
 
 router.get("/messages/:senderId/:receiverId", verifyToken, async (req, res) => {
-  try {
-    const { senderId, receiverId } = req.params;
-
-    const messages = await Message.find({
-      $or: [
-        { sender: senderId, receiver: receiverId },
-        { sender: receiverId, receiver: senderId },
-      ],
-    }).sort({ timestamp: 1 });
-
-    await Message.updateMany(
-      { sender: receiverId, receiver: senderId, seen: false },
-      { $set: { seen: true } }
-    );
-
-    res.status(200).json({ messages: messages });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+    try {
+      const { senderId, receiverId } = req.params;
+  
+      const messages = await Message.find({
+        $or: [
+          { sender: senderId, receiver: receiverId },
+          { sender: receiverId, receiver: senderId },
+        ],
+      }).sort({ timestamp: 1 }).populate('sender', 'name').populate('receiver', 'name');
+  
+      await Message.updateMany(
+        { sender: receiverId, receiver: senderId, seen: false },
+        { $set: { seen: true } }
+      );
+  
+      res.status(200).json({ messages: messages });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
 
 module.exports = router;

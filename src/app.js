@@ -34,6 +34,7 @@ const assetRoute = require("./routers/asset");
 const NotiRoute = require("./routers/notification");
 const TimesheetRoute = require("./routers/timesheet");
 const DashboardRoute = require("./routers/dashboard");
+const ChatRoute = require("./routers/chat");
 
 const DB = process.env.DATABASE;
 
@@ -66,6 +67,7 @@ app.use("/asset", assetRoute);
 app.use("/", NotiRoute);
 app.use("/timesheet", TimesheetRoute);
 app.use("/", DashboardRoute);
+app.use("/chat", ChatRoute);
 
 app.listen(port, () => {
   console.log(`connection is live at port no ${port}`);

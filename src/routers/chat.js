@@ -18,7 +18,7 @@ router.get("/chatList", verifyToken, async (req, res) => {
       (employee) => employee._id.toString() !== userId
     );
 
-    res.status(200).json({list:employees});
+    res.status(200).json({ list: employees });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
@@ -79,7 +79,7 @@ router.get("/messages/:senderId/:receiverId", verifyToken, async (req, res) => {
       { $set: { seen: true } }
     );
 
-    res.status(200).json(messages);
+    res.status(200).json({ messages: messages });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

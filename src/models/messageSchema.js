@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const messageSchema = new mongoose.Schema({
   sender: {
     _id: {
-      ref: "Employee",
       required: true,
     },
     name: {
@@ -13,7 +12,6 @@ const messageSchema = new mongoose.Schema({
   },
   receiver: {
     _id: {
-      ref: "Employee",
       required: true,
     },
     name: {

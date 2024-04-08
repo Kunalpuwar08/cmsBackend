@@ -63,26 +63,26 @@ router.post("/send", verifyToken, async (req, res) => {
 });
 
 router.get("/messages/:senderId/:receiverId", verifyToken, async (req, res) => {
-    try {
-      const { senderId, receiverId } = req.params;
-  
-      const messages = await Message.find({
-        $or: [
-          { sender: senderId, receiver: receiverId },
-          { sender: receiverId, receiver: senderId },
-        ],
-      }).sort({ timestamp: 1 }).populate('sender', 'name').populate('receiver', 'name');
-  
-      await Message.updateMany(
-        { sender: receiverId, receiver: senderId, seen: false },
-        { $set: { seen: true } }
-      );
-  
-      res.status(200).json({ messages: messages });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
+  try {
+    const { senderId, receiverId } = req.params;
+
+    const messages = await Message.find({
+      $or: [
+        { "sender._id": senderId, "receiver._id": receiverId },
+        { "sender._id": receiverId, "receiver._id": senderId },
+      ],
+    }).sort({ createdAt: -1 });
+
+    await Message.updateMany(
+      { "sender._id": receiverId, "receiver._id": senderId, seen: false },
+      { $set: { seen: true } }
+    );
+
+    res.status(200).json({ messages: messages });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 module.exports = router;

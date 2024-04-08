@@ -25,18 +25,6 @@ admin.initializeApp({
 const app = express();
 const port = process.env.PORT || 3000;
 
-const { Server } = require("socket.io");
-const { createServer } = require("http");
-const cors = require("cors");
-
-const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
 
 const authRoute = require("./routers/auth");
 const todoRoute = require("./routers/todo");
@@ -63,7 +51,6 @@ mongoose
 const ipMiddleware = require("express-ip");
 const { ipChecker } = require("./common");
 
-app.use(cors())
 // app.use(ipChecker)
 app.use(express.json());
 app.use(ipMiddleware().getIpInfoMiddleware);
@@ -72,10 +59,6 @@ app.get("/", async (req, res) => {
   res.send("Welcome To CMS Backend");
 });
 
-io.on("connection", (socket) => {
-  console.log("user Connected");
-  console.log("Id", socket.id);
-});
 
 app.use("/", authRoute);
 app.use("/todo", todoRoute);

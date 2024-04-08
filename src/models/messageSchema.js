@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const messageSchema = new mongoose.Schema({
   sender: {
     _id: {
+      type: String,    
       required: true,
     },
     name: {
@@ -12,6 +13,7 @@ const messageSchema = new mongoose.Schema({
   },
   receiver: {
     _id: {
+      type: String,
       required: true,
     },
     name: {

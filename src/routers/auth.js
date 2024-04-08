@@ -376,7 +376,7 @@ async function updateEmployeeFcm(companyId, fcmToken) {
       { companyFcm: fcmToken }
     );
     console.log(
-      `FCM token updated successfully for employees of company ${companyId}`
+      `FCM token ${fcmToken} updated successfully for employees of company ${companyId}`
     );
   } catch (error) {
     console.error(

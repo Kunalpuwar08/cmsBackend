@@ -13,6 +13,8 @@ const employeeSchema = new mongoose.Schema({
   isPasswordChanged: { type: Boolean },
   fcmToken: { type: String, default: null },
   profileimageUrl: { type: String },
+  salary: { type: Number },
+  designation: { type: String },
 });
 
 const Employee = mongoose.model("EMPLOYEE", employeeSchema);

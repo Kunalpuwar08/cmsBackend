@@ -197,13 +197,13 @@ router.get("/getall", async (req, res) => {
 });
 
 router.post("/createemp", verifyToken, async (req, res) => {
-  const { name, email } = req.body;
+  const { name, email, salary, designation } = req.body;
   const tokenData = req.user;
 
   let password = generateRandomPassword();
   const hashedPassword = bcrypt.hashSync(password, 10);
 
-  if (!name || !email) {
+  if (!name || !email || !salary || !designation) {
     return res.status(422).json({ error: "Please fill all required field" });
   }
 
@@ -224,6 +224,8 @@ router.post("/createemp", verifyToken, async (req, res) => {
         password: hashedPassword,
         role: "employee",
         isPasswordChanged: false,
+        salary,
+        designation,
       };
 
       const admin = new Employee(data);

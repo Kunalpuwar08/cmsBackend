@@ -7,64 +7,64 @@ function generateRandomPassword() {
   return randomstring.generate(12);
 }
 
-function sendCredentialsByEmail(email, password) {
-  nodemailer.createTestAccount((err, account) => {
-    if (err) {
-      console.error("Failed to create a testing account. " + err.message);
-      return process.exit(1);
-    }
-
-    const transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      auth: {
-        user: "elliot.ferry@ethereal.email",
-        pass: "RTb1QqNHEdGJzVFURz",
-      },
-    });
-
-    const mailOptions = {
-      from: '"Buisness Hub" <elliot.ferry@ethereal.email>',
-      to: email,
-      subject: "Your credentials for buisness hub",
-      text: `Your new account credentials:\nEmail: ${email}\nPassword: ${password}`,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending email:", error);
-      } else {
-        console.log("Email sent:", info.response);
-        console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
-      }
-    });
-  });
-}
-
 // function sendCredentialsByEmail(email, password) {
-//   const transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//       user: 'kapuwar29@gmail.com',
-//       pass: 'Kunal@1029',
-//     },
-//   });
-
-//   const mailOptions = {
-//     from: '"Buisness Hub" <kapuwar29@gmail.com>',
-//     to: email,
-//     subject: 'Your credentials for business hub',
-//     text: `Your new account credentials:\nEmail: ${email}\nPassword: ${password}`,
-//   };
-
-//   transporter.sendMail(mailOptions, (error, info) => {
-//     if (error) {
-//       console.error('Error sending email:', error);
-//     } else {
-//       console.log('Email sent:', info.response);
+//   nodemailer.createTestAccount((err, account) => {
+//     if (err) {
+//       console.error("Failed to create a testing account. " + err.message);
+//       return process.exit(1);
 //     }
+
+//     const transporter = nodemailer.createTransport({
+//       host: "smtp.ethereal.email",
+//       port: 587,
+//       auth: {
+//         user: "elliot.ferry@ethereal.email",
+//         pass: "RTb1QqNHEdGJzVFURz",
+//       },
+//     });
+
+//     const mailOptions = {
+//       from: '"Buisness Hub" <elliot.ferry@ethereal.email>',
+//       to: email,
+//       subject: "Your credentials for buisness hub",
+//       text: `Your new account credentials:\nEmail: ${email}\nPassword: ${password}`,
+//     };
+
+//     transporter.sendMail(mailOptions, (error, info) => {
+//       if (error) {
+//         console.error("Error sending email:", error);
+//       } else {
+//         console.log("Email sent:", info.response);
+//         console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
+//       }
+//     });
 //   });
 // }
+
+function sendCredentialsByEmail(email, password) {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'kapuwar29@gmail.com',
+      pass: 'xksv zajv kwzl snfp',
+    },
+  });
+
+  const mailOptions = {
+    from: '"Buisness Hub" <kapuwar29@gmail.com>',
+    to: email,
+    subject: 'Your credentials for business hub',
+    text: `Your new account credentials:\nEmail: ${email}\nPassword: ${password}`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+    } else {
+      console.log('Email sent:', info.response);
+    }
+  });
+}
 
 function verifyToken(req, res, next) {
   const token = req.headers["authorization"];

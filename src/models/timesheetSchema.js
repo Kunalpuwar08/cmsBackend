@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const timesheetSchema = new mongoose.Schema({
   companyId: { type: String },
+  name: { type: String },
   projectId: { type: String, require: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   date: { type: Date, required: true },

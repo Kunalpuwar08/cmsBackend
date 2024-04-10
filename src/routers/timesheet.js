@@ -1,12 +1,13 @@
 const express = require("express");
 const { verifyToken } = require("../common");
 const Timesheet = require("../models/timesheetSchema");
+const Employee = require("../models/employeeSchema");
 const router = express.Router();
 
 router.post("/create", verifyToken, async (req, res) => {
   try {
     const { projectId, date, hours, description } = req.body;
-    const { userId, companyId } = req.user;
+    const { userId, companyId, name } = req.user;
 
     const existingTimesheet = await Timesheet.findOne({ userId, date });
 
@@ -23,6 +24,7 @@ router.post("/create", verifyToken, async (req, res) => {
       hours,
       description,
       companyId,
+      name,
     });
 
     await timesheet.save();
@@ -56,17 +58,18 @@ router.get("/admin/list", verifyToken, async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const timesheets = await Timesheet.find();
+    const timesheets = await Timesheet.find({ companyId: userId });
+
     const timesheetsByEmployee = {};
 
-    const employees = await User.find({ companyId: userId }, "name");
+    const employees = await Employee.find({ companyId: userId }, "name");
 
     employees.forEach((employee) => {
       timesheetsByEmployee[employee.name] = [];
     });
 
     timesheets.forEach((timesheet) => {
-      timesheetsByEmployee[timesheet.userId.name].push(timesheet);
+      timesheetsByEmployee[timesheet.name].push(timesheet);
     });
 
     res.status(200).json(timesheetsByEmployee);
